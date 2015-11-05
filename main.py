@@ -15,7 +15,6 @@ Representation conventions for dates:
 """
 
 import flask
-from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
@@ -29,8 +28,8 @@ import datetime # But we may still need time
 from dateutil import tz  # For interpreting local times
 
 # Mongo database
-from pymongo import MongoClient
-from bson.objectid import ObjectId
+from pymongo import MongoClient, DESCENDING
+from bson import ObjectId
 
 
 ###
@@ -65,6 +64,30 @@ def index():
       app.logger.debug("Memo: " + str(memo))
   return flask.render_template('index.html')
 
+@app.route("/create_memo", methods=["POST"])
+def create_memo():
+    app.logger.debug("Create memo entry")
+    
+    time = request.form['time']
+    text = request.form['text']
+    
+    try: 
+        dt = arrow.get(time, 'MM/DD/YYYY').replace(days=+1)
+    except:
+        return 'params invalid'
+    put_memo(dt, text);
+    \
+    return "ok"
+
+@app.route("/remove_memo", methods=["POST"])
+def remove_memo():
+    app.logger.debug("Remove memo entry")
+    # first get params from form
+    id = request.form['id']
+    # remove memo
+    del_memo(id)
+    return "ok"
+    
 
 # We don't have an interface for creating memos yet
 # @app.route("/create")
@@ -128,42 +151,41 @@ def get_memos():
     can be inserted directly in the 'session' object.
     """
     records = [ ]
-    for record in collection.find( { "type": "dated_memo" } ):
+    
+    for record in collection.find({"type": "dated_memo"}).sort('date',
+            DESCENDING):
         record['date'] = arrow.get(record['date']).isoformat()
+        
+        record['id'] = '%s' % record['_id']
         del record['_id']
         records.append(record)
     return records 
 
 
 def put_memo(dt, mem):
-     """
-     Place memo into database
-     Args:
-        dt: Datetime (arrow) object
-        mem: Text of memo
-     NOT TESTED YET
-     """
-     record = { "type": "dated_memo", 
-                "date": dt.to('utc').naive,
-                "text": mem
-             }
-     collection.insert(record)
-     return
+    """
+    Place memo into database
+    Args:
+    dt: Datetime (arrow) object
+    mem: Text of memo
+    NOT TESTED YET
+    """
+    record = { "type": "dated_memo", 
+        "date": dt.to('utc').naive,
+        "text": mem,
+    }
+    collection.insert(record)
+    return 
 
+def del_memo(id):
+    """
+    Remove memo from database
+    Args:
+    id: Mongodb _id
+    """
+    collection.remove({'_id': ObjectId(id)})
+    return;
 
-@app.route("/_create")
-def create():
-	date = arrow.get(request.args.get('date'),"MM/DD/YYYY").replace(days =+1)	
-	memo = request.args.get('create_memo')
-	put_memo(date,memo)
-	return flask.redirect(url_for('index'))
-
-@app.route("/_delete")
-def delete():
-    id = request.args.get('id')
-    record = {"_id": ObjectId(id)}
-    collection.remove(record)
-    return flask.redirect(url_for('index'))
 
 if __name__ == "__main__":
     # App is created above so that it will

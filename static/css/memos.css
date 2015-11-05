@@ -13,3 +13,21 @@
 .attribution  {
     font-size: smaller;
 }
+
+.container {
+    width: 600px;
+    margin: 0 auto;
+}
+
+#create-memo-form span{ 
+    width: 100px;
+}
+#create-memo-form input {
+    width: 470px;
+}
+#create-memo-form button {
+    width: 100%;
+}
+h1 {
+    text-align: center;
+}
