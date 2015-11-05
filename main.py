@@ -15,6 +15,7 @@ Representation conventions for dates:
 """
 
 import flask
+from flask import redirect
 from flask import render_template
 from flask import request
 from flask import url_for
@@ -29,6 +30,7 @@ from dateutil import tz  # For interpreting local times
 
 # Mongo database
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 
 ###
@@ -148,20 +150,20 @@ def put_memo(dt, mem):
      collection.insert(record)
      return
 
+
 @app.route("/_create")
 def create():
 	date = arrow.get(request.args.get('date'),"MM/DD/YYYY").replace(days =+1)	
 	memo = request.args.get('create_memo')
 	put_memo(date,memo)
-	return flask.redirect(url_for('index')
-
-@app.route("/_remove")
-def delete():
-	id = request.args.get('id')
-	record= {"_id": ObjectId(id)}
-	collection.remove(record)
 	return flask.redirect(url_for('index'))
 
+@app.route("/_delete")
+def delete():
+    id = request.args.get('id')
+    record = {"_id": ObjectId(id)}
+    collection.remove(record)
+    return flask.redirect(url_for('index'))
 
 if __name__ == "__main__":
     # App is created above so that it will
