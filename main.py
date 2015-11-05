@@ -35,12 +35,12 @@ from bson import ObjectId
 ###
 # Globals
 ###
-import CONFIG
+import config
 
 app = flask.Flask(__name__)
 
 try:
-    dbclient = MongoClient(CONFIG.MONGO_URL)
+    dbclient = MongoClient(config.MONGO_URL)
     db = dbclient.memos
     collection = db.dated
 
@@ -191,15 +191,15 @@ if __name__ == "__main__":
     # App is created above so that it will
     # exist whether this is 'main' or not
     # (e.g., if we are running in a CGI script)
-    app.debug=CONFIG.DEBUG
+    app.debug=config.DEBUG
     app.logger.setLevel(logging.DEBUG)
     # We run on localhost only if debugging,
     # otherwise accessible to world
-    if CONFIG.DEBUG:
+    if config.DEBUG:
         # Reachable only from the same computer
-        app.run(port=CONFIG.PORT)
+        app.run(port=config.PORT)
     else:
         # Reachable from anywhere 
-        app.run(port=CONFIG.PORT,host="0.0.0.0")
+        app.run(port=config.PORT,host="0.0.0.0")
 
 
