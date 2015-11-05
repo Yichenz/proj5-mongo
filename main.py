@@ -1,18 +1,18 @@
 """
-Flask web app connects to Mongo database.
-Keep a simple list of dated memoranda.
-
-Representation conventions for dates: 
-   - In the session object, date or datetimes are represented as
-   ISO format strings in UTC.  Unless otherwise specified, this
-   is the format passed around internally. Note that ordering
-   of ISO format strings is consistent with date/time order
-   - User input/output is in local (to the server) time
-   - Database representation is as MongoDB 'Date' objects
-   Note that this means the database may store a date before or after
-   the date specified and viewed by the user, because 'today' in
-   Greenwich may not be 'today' here. 
-"""
+    Flask web app connects to Mongo database.
+    Keep a simple list of dated memoranda.
+    
+    Representation conventions for dates:
+    - In the session object, date or datetimes are represented as
+    ISO format strings in UTC.  Unless otherwise specified, this
+    is the format passed around internally. Note that ordering
+    of ISO format strings is consistent with date/time order
+    - User input/output is in local (to the server) time
+    - Database representation is as MongoDB 'Date' objects
+    Note that this means the database may store a date before or after
+    the date specified and viewed by the user, because 'today' in
+    Greenwich may not be 'today' here.
+    """
 
 import flask
 from flask import render_template
@@ -22,7 +22,7 @@ from flask import url_for
 import json
 import logging
 
-# Date handling 
+# Date handling
 import arrow # Replacement for datetime, based on moment.js
 import datetime # But we may still need time
 from dateutil import tz  # For interpreting local times
@@ -39,7 +39,7 @@ import CONFIG
 
 app = flask.Flask(__name__)
 
-try: 
+try:
     dbclient = MongoClient(CONFIG.MONGO_URL)
     db = dbclient.memos
     collection = db.dated
@@ -58,11 +58,11 @@ app.secret_key = str(uuid.uuid4())
 @app.route("/")
 @app.route("/index")
 def index():
-  app.logger.debug("Main page entry")
-  flask.session['memos'] = get_memos()
-  for memo in flask.session['memos']:
-      app.logger.debug("Memo: " + str(memo))
-  return flask.render_template('index.html')
+    app.logger.debug("Main page entry")
+    flask.session['memos'] = get_memos()
+    for memo in flask.session['memos']:
+        app.logger.debug("Memo: " + str(memo))
+    return flask.render_template('index.html')
 
 @app.route("/create_memo", methods=["POST"])
 def create_memo():
@@ -71,7 +71,7 @@ def create_memo():
     time = request.form['time']
     text = request.form['text']
     
-    try: 
+    try:
         dt = arrow.get(time, 'MM/DD/YYYY').replace(days=+1)
     except:
         return 'params invalid'
@@ -87,7 +87,7 @@ def remove_memo():
     # remove memo
     del_memo(id)
     return "ok"
-    
+
 
 # We don't have an interface for creating memos yet
 # @app.route("/create")
@@ -109,10 +109,10 @@ def page_not_found(error):
 #
 #################
 
-# NOT TESTED with this application; may need revision 
+# NOT TESTED with this application; may need revision
 #@app.template_filter( 'fmtdate' )
 # def format_arrow_date( date ):
-#     try: 
+#     try:
 #         normal = arrow.get( date )
 #         return normal.to('local').format("ddd MM/DD/YYYY")
 #     except:
@@ -121,21 +121,21 @@ def page_not_found(error):
 @app.template_filter( 'humanize' )
 def humanize_arrow_date( date ):
     """
-    Date is internal UTC ISO format string.
-    Output should be "today", "yesterday", "in 5 days", etc.
-    Arrow will try to humanize down to the minute, so we
-    need to catch 'today' as a special case. 
-    """
+        Date is internal UTC ISO format string.
+        Output should be "today", "yesterday", "in 5 days", etc.
+        Arrow will try to humanize down to the minute, so we
+        need to catch 'today' as a special case.
+        """
     try:
         then = arrow.get(date).to('local')
         now = arrow.utcnow().to('local')
         if then.date() == now.date():
             human = "Today"
-        else: 
+        else:
             human = then.humanize(now)
             if human == "in a day":
                 human = "Tomorrow"
-    except: 
+    except:
         human = date
     return human
 
@@ -147,42 +147,42 @@ def humanize_arrow_date( date ):
 ##############
 def get_memos():
     """
-    Returns all memos in the database, in a form that
-    can be inserted directly in the 'session' object.
-    """
+        Returns all memos in the database, in a form that
+        can be inserted directly in the 'session' object.
+        """
     records = [ ]
     
     for record in collection.find({"type": "dated_memo"}).sort('date',
-            DESCENDING):
+                                                               DESCENDING):
         record['date'] = arrow.get(record['date']).isoformat()
         
         record['id'] = '%s' % record['_id']
         del record['_id']
         records.append(record)
-    return records 
+    return records
 
 
 def put_memo(dt, mem):
     """
-    Place memo into database
-    Args:
-    dt: Datetime (arrow) object
-    mem: Text of memo
-    NOT TESTED YET
-    """
-    record = { "type": "dated_memo", 
+        Place memo into database
+        Args:
+        dt: Datetime (arrow) object
+        mem: Text of memo
+        NOT TESTED YET
+        """
+    record = { "type": "dated_memo",
         "date": dt.to('utc').naive,
         "text": mem,
     }
     collection.insert(record)
-    return 
+    return
 
 def del_memo(id):
     """
-    Remove memo from database
-    Args:
-    id: Mongodb _id
-    """
+        Remove memo from database
+        Args:
+        id: Mongodb _id
+        """
     collection.remove({'_id': ObjectId(id)})
     return;
 
@@ -202,4 +202,4 @@ if __name__ == "__main__":
         # Reachable from anywhere 
         app.run(port=CONFIG.PORT,host="0.0.0.0")
 
-    
+

@@ -1,8 +1,13 @@
 function create_memo() {
-    
+    // first get datetime and text from input
     var time = $('#time').val();
     var text = $('#text').val();
-   
+    // check time and text
+    if (!time || !text) {
+        alert("please input time and text");
+        return
+    }
+    // use ajax to request the server
     $.ajax({
         'url': '/create_memo',
         'type': 'post',
@@ -28,7 +33,7 @@ function create_memo() {
 }
 
 function remove_memo(id) {
-    
+    // use ajax to request the server
     $.ajax({
         'url': '/remove_memo',
         'type': 'post',

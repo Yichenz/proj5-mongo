@@ -1,67 +1,67 @@
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
 <html>
-<head>
-    <title>Memos</title>
-    <!-- 'viewport' is used by bootstrap to respond to device size -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Javascript:  JQuery from a content distribution network (CDN) -->
-    <script
-        src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
-    </script>
-
-    <!-- Bootstrap includes javascript and css  (must follow jquery) -->
-    <link rel="stylesheet"
-        href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script
-        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">
-    </script>
-
-    <!-- Our own style sheet -->
-    <link rel="stylesheet" href="/static/css/memos.css" />
-
-    <!-- Our own javascript -->
-    <script src="/static/js/memos.js"></script>
-
-</head>
-<body>
-    <div class="container">
-        <!-- Flashed messages before content -->
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul class=flashes>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-        {% endwith %}
-
-        <!-- Create memo form -->
-        <div id="memo-form">
-            <!-- using input-group of boostrap -->
-            <h1>Create memo</h1>
-            <div class="input-group">
-                <span class="input-group" id="basic1">Time</span>
+    <head>
+        <title>Memos</title>
+        <!-- 'viewport' is used by bootstrap to respond to device size -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+            
+            <!-- Javascript:  JQuery from a content distribution network (CDN) -->
+            <script
+                src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js">
+                </script>
+            
+            <!-- Bootstrap includes javascript and css  (must follow jquery) -->
+            <link rel="stylesheet"
+                href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+                <script
+                    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js">
+                    </script>
                 
-                <input id="time" type="text" class="form-control" 
-                    placeholder="Please input datetime">
+                <!-- Our own style sheet -->
+                <link rel="stylesheet" href="/static/css/memos.css" />
+                
+                <!-- Our own javascript -->
+                <script src="/static/js/memos.js"></script>
+                
+    </head>
+    <body>
+        <div class="container">
+            <!-- Flashed messages before content -->
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <ul class=flashes>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endwith %}
+            
+            <!-- Create memo form -->
+            <div id="memo-form">
+                <!-- using input-group of boostrap -->
+                <h1>Create memo</h1>
+                <div class="input-group">
+                    <span class="input-group" id="basic1">Time</span>
+                    
+                    <input id="time" type="text" class="form-control"
+                        placeholder="Please input datetime">
+                        </div>
+                <div class="input-group">
+                    <span class="input-group" id="basic2">Text</span>
+                    <input id="text" type="text" class="form-control"
+                        placeholder="Please input username">
+                        </div>
+                <button class="btn btn-primary" onclick="create_memo();">Create Memo</button>
             </div>
-            <div class="input-group">
-                <span class="input-group" id="basic2">Text</span>
-                <input id="text" type="text" class="form-control" 
-                    placeholder="Please input username">
-            </div>
-            <button class="btn btn-primary" onclick="create_memo();">Create Memo</button>
-        </div>
-
-        <h1>Memos</h1>
-        {% if session.memos %}
+            
+            <h1>Memos</h1>
+            {% if session.memos %}
             <table class="table">
                 <thead>
                     <tr><th>Time</th><th>Text</th><th>Operation</th></tr>
                 </thead>
-            {% for memo in session.memos %}
+                {% for memo in session.memos %}
                 <tr>
                     <td class="time">{{ memo.date | humanize }}</td>
                     <td class="text">{{ memo.text }}</td>
@@ -69,12 +69,12 @@
                         <button class="btn btn-sm btn-warning" onclick="remove_memo('{{ memo.id }}');">Remove</button>
                     </td>
                 </tr>
-            {% endfor %}
+                {% endfor %}
             </table>
-        {% else %}
+            {% else %}
             <p>No memos for you. </p>  
-        {% endif %}
-
-    </div> <!-- container -->
-</body>
+            {% endif %}
+            
+        </div> <!-- container -->
+    </body>
 </html>
