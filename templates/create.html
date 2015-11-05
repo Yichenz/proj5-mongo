@@ -37,17 +37,19 @@
   {% endif %}
 {% endwith %}
 
-<form method="PUT" action="_create">
+<form method="PUT" action="{{url_for('create')}}">
 <div class="row">
     <div class="col-md-2">
     <input type="text" class="form-control"
-     name="Date" value=""/>
+     name="date" placeholder="MM/DD/YYYY"/>
   </div>
   <div class="col-md-10">
     <input type="text" class="form-control"
-      name="Memo" value="Memo" />
+      name="memo" value="Memo" />
   </div>
  </div>
+<br>
+<button id = "submit">Submit</button>
 </form>
 </div> 
 </body>

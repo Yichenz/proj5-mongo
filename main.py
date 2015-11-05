@@ -133,20 +133,34 @@ def get_memos():
     return records 
 
 
-# def put_memo(dt, mem):
-#     """
-#     Place memo into database
-#     Args:
-#        dt: Datetime (arrow) object
-#        mem: Text of memo
-#     NOT TESTED YET
-#     """
-#     record = { "type": "dated_memo", 
-#                "date": dt.to('utc').naive,
-#                "text": mem
-#             }
-#     collection.insert(record)
-#     return 
+def put_memo(dt, mem):
+     """
+     Place memo into database
+     Args:
+        dt: Datetime (arrow) object
+        mem: Text of memo
+     NOT TESTED YET
+     """
+     record = { "type": "dated_memo", 
+                "date": dt.to('utc').naive,
+                "text": mem
+             }
+     collection.insert(record)
+     return
+
+@app.route("/_create")
+def create():
+	date = arrow.get(request.args.get('date'),"MM/DD/YYYY").replace(days =+1)	
+	memo = request.args.get('create_memo')
+	put_memo(date,memo)
+	return flask.redirect(url_for('index')
+
+@app.route("/_remove")
+def delete():
+	id = request.args.get('id')
+	record= {"_id": ObjectId(id)}
+	collection.remove(record)
+	return flask.redirect(url_for('index'))
 
 
 if __name__ == "__main__":
